@@ -33,7 +33,7 @@ from relay.storage import InvalidInput
 
 ROUTED = ("TMPDIR", "CLAUDE_CODE_TMPDIR", "CLAUDE_TMPDIR")
 UID = os.getuid()
-CLIENT = "/Users/saranyan/.local/share/claude/versions/2.1.296"
+CLIENT = os.path.expanduser("~/.local/share/claude/versions/2.1.296")
 EVIDENCE = os.path.join(os.path.dirname(__file__), "fixtures", "claude-temp-routing.txt")
 SESSION = "00000000-0000-4000-8000-000000000000"
 

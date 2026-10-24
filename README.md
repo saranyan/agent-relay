@@ -8,6 +8,21 @@ implements and reports), so you stop copying text between terminals. It runs in
 the foreground on your machine, records every message durably, and stops for you
 whenever something needs a human decision.
 
+<picture>
+  <source media="(prefers-color-scheme: light)" srcset="docs/images/home-light.png">
+  <img alt="The agent-relay web console listing Claude and Codex sessions, one needing a decision and two managed by AI" src="docs/images/home-dark.png">
+</picture>
+
+<table>
+  <tr>
+    <td width="50%"><img alt="Summary of a session managed by an AI reviewer" src="docs/images/summary.png"><br><sub><b>Watch:</b> what the managed session is doing, in plain language.</sub></td>
+    <td width="50%"><img alt="A session stopped to ask the user a question, with an answer box" src="docs/images/decision.png"><br><sub><b>Decide:</b> questions stop the loop until you answer.</sub></td>
+  </tr>
+</table>
+
+*Screenshots are from `scripts/console-demo.sh`, which uses pretend sessions. See
+the [web console tour](docs/web-console.md) for more.*
+
 - **No dependencies.** Standard-library Python 3.11+. No daemon, database, API
   key or hosted account. The only network listener is the optional web console,
   which binds to loopback.
@@ -34,6 +49,10 @@ whenever something needs a human decision.
 No install step is needed. Clone the repository and run it from the checkout.
 These commands use fake clients, so they're safe to run anywhere and use no model
 quota:
+
+Requirements: macOS (Linux is untested), Python 3.11 or newer. Real sessions also need the
+[Claude Code](https://docs.anthropic.com/en/docs/claude-code) and/or
+[Codex](https://github.com/openai/codex) CLIs; the demos don't.
 
 ```sh
 git clone <this-repo> agent-relay && cd agent-relay
@@ -210,14 +229,27 @@ relay/host.py          web-console service; relay/server.py + relay/web/ serve t
 tests/                 unittest suite (fake clients, temporary roots)
 scripts/               demos and bounded live-probe scripts for the real adapters
 prompts/               participant instructions for Claude and Codex
-docs/                  protocol, integration feasibility, context reporting, walkthrough
+docs/                  web console tour, protocol, integration feasibility, context reporting, walkthrough
 ```
+
+## Documentation
+
+| Document | What it covers |
+|---|---|
+| [Web console tour](docs/web-console.md) | Every screen of `relay serve`, with screenshots |
+| [Walkthrough](docs/WALKTHROUGH.md) | A recorded two-terminal run with real message and turn IDs |
+| [Protocol](docs/PROTOCOL.md) | The normative spec: root layout, envelopes, state machines, adapter contract |
+| [Integration feasibility](docs/INTEGRATION-FEASIBILITY.md) | What real Claude Code and Codex surfaces can and can't do |
+| [Context reporting](docs/CONTEXT-REPORTING.md) | How session titles and summaries are discovered and reported |
+| [Roadmap](ROADMAP.md) | What's left before 1.0 and what comes after |
+| [Changelog](CHANGELOG.md) | Release notes |
 
 ## Contributing
 
-Issues and pull requests are welcome. Please run the full test suite before you
-open a PR. Changes that affect the real adapters should explain how they were
-verified, because those adapters drive live sessions.
+Issues and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md)
+for the development setup and the rules for changes to the real adapters, and
+[SECURITY.md](SECURITY.md) to report a vulnerability privately. This project
+follows the [Contributor Covenant](CODE_OF_CONDUCT.md).
 
 ## License
 
