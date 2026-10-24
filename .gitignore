@@ -1,0 +1,18 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.DS_Store
+
+# Local relay roots and run output
+runs/
+relay-root/
+*.log
+
+# Editor / agent tool state
+.idea/
+.vscode/
+.truckstop-*
+build/
+dist/
+*.egg-info/

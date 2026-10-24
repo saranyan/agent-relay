@@ -1,0 +1,4 @@
+#!/bin/sh
+# Thin wrapper: run the relay CLI from this checkout.
+HERE="$(cd "$(dirname "$0")" && pwd)"
+PYTHONPATH="$HERE${PYTHONPATH:+:$PYTHONPATH}" exec python3 -m relay "$@"

@@ -1,0 +1,18 @@
+Claude Code temp routing evidence, 2026-10-12 (offline; read from the installed binary, no process run).
+Client: Claude Code 2.1.296, sha256 c9b5341637becbd423ddffc5b254afb645682a3868cb708bbc6cc0e7bb419937
+
+## Fragments (verbatim; minified names as in the binary)
+- found=yes: function ym(){let e=a.CLAUDE_CODE_TMPDIR;if(e)return e;return"/tmp"}
+- found=yes: let n=D(ym(),kGn())
+- found=yes: function kGn(){return`claude-${process.getuid?.()??0}`}
+- found=yes: let C=process.env.CLAUDE_CODE_TMPDIR||process.env.CLAUDE_TMPDIR||"/tmp/claude";a.push(`TMPDIR=${C}`)
+- found=yes: let s=r==="macos"?void 0:Sl(e,"TMPDIR")??Sl(e,"TMP")??Sl(e,"TEMP")
+- found=yes: i=me(r,T.O_RDONLY|T.O_DIRECTORY|T.O_NOFOLLOW)
+- found=yes: function hx(e){return e!==void 0&&e.length>1?e.replace(/[\\/]+$/,""):e}
+
+## Reading
+- Per-uid temp folder: join(ym(), "claude-<uid>"), where ym() = CLAUDE_CODE_TMPDIR or "/tmp". It is created with mode 0700 and then opened O_RDONLY|O_DIRECTORY|O_NOFOLLOW to check its owner.
+- On macOS the general temp lookup skips TMPDIR/TMP/TEMP (the r==="macos" branch) and falls back to "/tmp" unless CLAUDE_CODE_TMPDIR is set.
+- Sandboxed commands get TMPDIR = CLAUDE_CODE_TMPDIR || CLAUDE_TMPDIR || "/tmp/claude".
+- The client strips trailing slashes from its temp roots.
+- Unproven, for the record only: the run-#2/startup 55-byte stderr line has the length of "EPERM: operation not permitted, open '/tmp/claude-501'" plus a newline.

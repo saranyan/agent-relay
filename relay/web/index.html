@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>Relay</title>
+<link rel="stylesheet" href="/app.css?t=__TOKEN__">
+</head>
+<body>
+<header class="bar">
+  <a class="mark" href="#/" aria-label="All sessions">Relay</a>
+  <nav class="bar-r">
+    <a href="#/notifications" class="quiet">Notifications</a>
+    <a href="#/events" class="quiet">Events</a>
+    <button id="theme" type="button" class="icon-btn" aria-label="Switch appearance"></button>
+  </nav>
+</header>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<main id="view" class="view" tabindex="-1"></main>
+<script src="/app.js?t=__TOKEN__"></script>
+</body>
+</html>

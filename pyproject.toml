@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agent-relay"
+version = "0.1.0"
+description = "Pair two AI coding sessions (Codex and Claude Code) with a human in control."
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.11"
+dependencies = []
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: MacOS",
+    "Programming Language :: Python :: 3",
+]
+
+[project.scripts]
+relay = "relay.cli:main"
+
+[tool.setuptools]
+packages = ["relay", "relay.adapters"]
+
+[tool.setuptools.package-data]
+relay = ["web/*"]
