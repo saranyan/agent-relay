@@ -55,7 +55,7 @@ Requirements: macOS (Linux is untested), Python 3.11 or newer. Real sessions als
 [Codex](https://github.com/openai/codex) CLIs; the demos don't.
 
 ```sh
-git clone <this-repo> agent-relay && cd agent-relay
+git clone https://github.com/saranyan/agent-relay.git && cd agent-relay
 
 # Run the full two-terminal demo in a fresh temporary directory
 scripts/walkthrough.sh

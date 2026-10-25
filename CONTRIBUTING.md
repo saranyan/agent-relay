@@ -7,7 +7,7 @@ opening a pull request.
 ## Development setup
 
 ```sh
-git clone <this-repo> agent-relay && cd agent-relay
+git clone https://github.com/saranyan/agent-relay.git && cd agent-relay
 python3 --version                                    # 3.11 or newer
 python3 -m unittest discover -s tests -p 'test_*.py' # full suite
 ```

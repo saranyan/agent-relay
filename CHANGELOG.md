@@ -32,5 +32,5 @@ The first public release: an experimental developer preview.
 - **Fake clients, demos and tests:** fake clients, `scripts/walkthrough.sh`,
   `scripts/console-demo.sh`, and a test suite of 520 tests.
 
-[Unreleased]: https://github.com/OWNER/agent-relay/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/OWNER/agent-relay/releases/tag/v0.1.0
+[Unreleased]: https://github.com/saranyan/agent-relay/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/saranyan/agent-relay/releases/tag/v0.1.0
