@@ -37,7 +37,7 @@ one of them is exactly what we want to hear about.
 
 - **Same-user processes:** they can read and write the relay root. Participant
   labels and the hash chain are not authentication against a malicious
-  same-user process. See "Limits" in the [README](README.md#guarantees-and-limits).
+  same-user process. See "Guarantees and limits" in the [reference](docs/REFERENCE.md#guarantees-and-limits).
 - **Model output:** what a model writes. Messages that claim approval are
   treated as data and grant nothing, but the relay doesn't judge whether a model's
   work is correct.

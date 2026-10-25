@@ -32,6 +32,9 @@ Items aren't promises or dates. If you want to work on one, open an issue first.
 - [ ] **Support Codex 0.162+ permission profiles.** Settle how the relay verifies
   a resumed thread's permission profile on current Codex versions, where the
   legacy sandbox fields are reported differently.
+- [ ] **Bound Codex fan-out.** The Claude routes start with no subagent or command
+  tools, but Codex's `multiAgentMode` is only recorded. Make the Codex launch path
+  turn it off, or refuse to start when it can't be confirmed off.
 - [ ] **Reconcile Codex crashes from evidence.** After a crash, use the client's
   own turn history to decide whether a turn was delivered, instead of always
   stopping for a human.
@@ -66,7 +69,10 @@ Items aren't promises or dates. If you want to work on one, open an issue first.
   Planner and Pair programmer, as a plain text file in the relay root.
 - **Saved playbooks.** Reusable goal, scope, check and budget templates for
   common jobs, such as "fix failing tests" or "review this branch".
-- **Budget insights.** Show turns and time used per team, and where loops stall.
+- **Budget insights.** Show turns, time and tokens used per team, and where loops
+  stall. Today the turn budget counts hand-offs, not the work inside a turn.
+- **Evaluation runs.** Run several model pairings on the same task with the same
+  budget, and compare the recorded threads.
 
 ### Clients
 
