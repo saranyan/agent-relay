@@ -28,6 +28,7 @@ from .observer import Discovery, Timeline, build_state
 from .storage import RelayError, check_name
 
 MAX_BODY = 64 * 1024
+DRAIN_LIMIT = 1024 * 1024  # an oversized body up to this size is read and dropped before the 413
 
 WEB = os.path.join(os.path.dirname(os.path.abspath(__file__)), "web")
 STATIC = {"/": ("index.html", "text/html; charset=utf-8"),
@@ -81,6 +82,17 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         if self.command != "HEAD":
             self.wfile.write(body)
+
+    def _discard(self, n: int) -> None:
+        self.connection.settimeout(2)
+        try:
+            while n > 0:
+                chunk = self.rfile.read(min(n, 65536))
+                if not chunk:
+                    break
+                n -= len(chunk)
+        except OSError:
+            pass
 
     def _json(self, code: int, obj) -> None:
         self._send(code, json.dumps(obj, default=str).encode(), "application/json")
@@ -149,6 +161,10 @@ class Handler(BaseHTTPRequestHandler):
         except ValueError:
             n = -1
         if n < 0 or n > MAX_BODY:
+            # Drain a bounded amount first: closing on an unread body resets the connection and the
+            # client never sees the 413.
+            self.close_connection = True
+            self._discard(min(max(n, 0), DRAIN_LIMIT))
             return self._json(HTTPStatus.REQUEST_ENTITY_TOO_LARGE, {"error": "request too large"})
         try:
             body = json.loads(self.rfile.read(n) or b"{}")
