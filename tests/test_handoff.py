@@ -424,6 +424,13 @@ def _relay_writer_pids(home, sid):
     return [w["pid"] for w in live_writers(home, sid) if w["writer"] == "relay"]
 
 
+def _killed(pid):
+    """Has a SIGKILLed process actually died (gone, or a zombie)? kill() returns before it has."""
+    import subprocess
+    stat = subprocess.run(["ps", "-o", "stat=", "-p", str(pid)], capture_output=True, text=True).stdout.strip()
+    return stat == "" or stat.startswith("Z")
+
+
 class CommitBoundaryTests(Base):
     """R1: the final submit commitment and ownership moves are totally ordered (control stream)."""
 
@@ -836,6 +843,9 @@ class RepeatedLaunchTests(Base):
         eid = next(e for e, m in again._handoff_members(pid).items() if m[1] == "cl")
         self.assertEqual(again.resolve_handoff(pid, eid)["state"], "blocked")
         os.kill(new["pid"], 9)
+        # The crash can come before the client writes its marker, so an empty marker list alone
+        # doesn't show the kill has landed (seen on CI: 'running' right after the kill).
+        self.wait_until(lambda: _killed(new["pid"]))
         self.wait_until(lambda: not _relay_writer_pids(self.home, "cl"))
         # Discovery still unavailable: this episode's own recorded process proves the exit.
         self.assertEqual(again.handoffs.relay_writer_status(key), "gone")
