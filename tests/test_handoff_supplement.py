@@ -174,7 +174,9 @@ class MidTurnWriterFailure(HostBase):
         reconcile(self.bus, pid, "continue", reason="checkpoint: probe stage")
         self.tick_until(lambda: not t.is_alive())
         self.assertEqual(verdict["verdict"], "observed", verdict)
-        self.tick_until(lambda: self.own("cl")["state"] == "blocked")
+        # Ownership and the turn record settle on different threads: wait for both (see uncertain_team).
+        self.tick_until(lambda: self.own("cl")["state"] == "blocked"
+                        and self.bus.pair_state(pid)["turns"][PROBE_TURN - 1]["phase"] != "accepted")
 
         st = self.bus.pair_state(pid)
         turn4 = st["turns"][PROBE_TURN - 1]
