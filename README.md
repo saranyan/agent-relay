@@ -1,5 +1,7 @@
 # agent-relay
 
+[![tests](https://github.com/saranyan/agent-relay/actions/workflows/tests.yml/badge.svg)](https://github.com/saranyan/agent-relay/actions/workflows/tests.yml)
+
 **Let AI coding sessions from different vendors work together, while you stay in charge.**
 
 <picture>
