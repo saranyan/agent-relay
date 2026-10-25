@@ -136,7 +136,10 @@ class HostBase(Base):
         self.tick_until(lambda: (self.bus.pair_state(pid).get("inflight") or {}).get("role") == "follower"
                         and self.bus.pair_state(pid)["inflight"]["phase"] == "accepted")
         os.kill(self.own("cl")["spawn"]["relay"]["pid"], signal.SIGKILL)
-        self.tick_until(lambda: self.own("cl")["state"] == "blocked")
+        # Ownership (console ticker) and the turn record (the team's controller thread) settle
+        # independently; on a slow machine the turn can lag, so wait for both.
+        self.tick_until(lambda: self.own("cl")["state"] == "blocked"
+                        and (self.bus.pair_state(pid)["turns"] or [{}])[-1].get("phase") != "accepted")
         st = self.bus.pair_state(pid)
         self.assertEqual(st["turns"][-1]["phase"], "uncertain")
         return pid
@@ -287,8 +290,10 @@ class ConsoleCrashDuringReturn(Base):
             {p: probe.status(self.bus, p) for p in self.bus.pair_ids()}, default=str)[:3000])
 
     def test_crash_while_returning_never_resends_and_needs_acknowledgement(self):
-        cl = self.terminal("cl", "Claude", 1, sleep=2.0)
-        cx = self.terminal("cx", "Codex", 1, sleep=2.0, finish_after=1000)
+        # 5 s turns: with 2 s, a busy machine sometimes finished turn 1 before the probe saw
+        # `returning` (an honest not_observed, but not the crash this test is about).
+        cl = self.terminal("cl", "Claude", 1, sleep=5.0)
+        cx = self.terminal("cx", "Codex", 1, sleep=5.0, finish_after=1000)
         console, rec, port, token = self.serve("a")
         self.assertEqual(probe.console_identity(rec, self.root.path)["pid"], console.pid)  # exec kept the pid
         rows = self.wait(lambda: {s["name"]: s for s in self.api(port, token, "/api/sessions")["sessions"]}
@@ -334,8 +339,12 @@ class ConsoleCrashDuringReturn(Base):
             return {s["name"]: s for s in self.api(port, token, "/api/sessions")["sessions"]
                     if s["name"].startswith("scratch")}
         r = self.wait(lambda: (lambda x: x if len(x) == 2 and all(v.get("ownership") for v in x.values()) else None)(rows()))
+        # The probe kills the console as soon as ANY role is returning; on a busy machine the
+        # other role may not have started its return yet. Each must be exactly as recorded.
+        role_of = {"scratch · Codex": "leader", "scratch · Claude": "follower"}
         for name, row in r.items():
-            self.assertEqual(row["ownership"]["state"], "returning", name)
+            want = "returning" if role_of[name] in verdict["returning"] else "relay_owned"
+            self.assertEqual(row["ownership"]["state"], want, name)
             self.assertTrue(row["ownership"]["orphaned"], name)
             self.assertNotIn("resume", row["ownership"], name)
         time.sleep(1.5)

@@ -108,8 +108,9 @@ class Controller:
         if state["pair"] != self.pair_id:
             raise Conflict(f"endpoint {eid} is not reserved for this pair")
         adapter = get_adapter(s["adapter"], s["options"])
-        if not adapter.verified and os.environ.get("AGENT_RELAY_ALLOW_UNVERIFIED") != "1":
-            raise Unsupported(f"adapter {adapter.name} is not verified against a live client; live "
+        if not (adapter.verified or s["mode"] in adapter.verified_modes) \
+                and os.environ.get("AGENT_RELAY_ALLOW_UNVERIFIED") != "1":
+            raise Unsupported(f"adapter {adapter.name} ({s['mode']}) is not verified against a live client; live "
                               "use needs explicit authorization and AGENT_RELAY_ALLOW_UNVERIFIED=1")
         self.caps[eid] = adapter.capabilities()
         if s["mode"] == "attach":

@@ -6,6 +6,7 @@ import signal
 import subprocess
 import sys
 import time
+from unittest import mock
 
 from util import REPO, RelayTest, env_for, relay, relay_json
 
@@ -494,13 +495,34 @@ Bus(Root(sys.argv[2])).pair_event(sys.argv[3], "paused", {"reason": "race"}, act
                   "26c6fd54-8cf7-480a-8dd8-e9e361ff299e", "--as", "claude")
         self.assertEqual(r.returncode, 9)
         self.assertIn("refusing to substitute resume or launch", r.stderr)
-        rec, _ = self.bus.register_session(adapter="codex-app-server", client_session_id="pending-x",
-                                           mode="launch", participant="codex", cwd=self.tmp)
+        rec, _ = self.bus.register_session(adapter="codex-app-server", client_session_id="thread-x",
+                                           mode="attach", participant="codex", cwd=self.tmp)
         f = self.launch_endpoint("claude")
         pid = self.pair(rec["id"], f)
         c = self.controller(pid, connect=False)
-        with self.assertRaises(Unsupported):
+        with self.assertRaises(Unsupported):  # attach hasn't been run live
             c.connect_all()
+
+    def test_live_verified_launch_passes_the_gate_but_unlocks_nothing_else(self):
+        from relay.adapters.claude import ClaudeStreamAdapter
+        from relay.adapters.codex import CodexAppServerAdapter
+        from relay.handoff import Handoffs
+
+        class Launched(Exception):
+            pass
+        for cls in (CodexAppServerAdapter, ClaudeStreamAdapter):
+            with self.subTest(cls.name):
+                self.assertFalse(cls.verified)  # hand-off and attach stay locked
+                self.assertEqual(cls.verified_modes, frozenset({"launch"}))
+                rec, _ = self.bus.register_session(adapter=cls.name, client_session_id=f"pending-{cls.name}",
+                                                   mode="launch", participant="codex", cwd=self.tmp)
+                pid = self.pair(rec["id"], self.launch_endpoint("claude"))
+                c = self.controller(pid, connect=False)
+                with mock.patch.object(cls, "launch", side_effect=Launched), self.assertRaises(Launched):
+                    c.connect(rec["id"])  # reaches the client: the gate let it through
+                c.shutdown()
+        h = Handoffs(self.bus, {}, lambda adapter, conversation: None)
+        self.assertIn("hasn't been verified live", h.supported("claude-agents", self.tmp))
 
     def test_cli_end_to_end_with_status_and_thread(self):
         lf = self.fake("codex-live", default={"finish_after": 2}, seed_history=2)

@@ -99,6 +99,9 @@ class Connection:
 class Adapter:
     name = "base"
     verified = False  # True only after a verified client contract (docs/INTEGRATION-FEASIBILITY.md)
+    # Session modes ("launch", "attach") proven by a recorded live run when the whole adapter
+    # isn't. Never unlocks hand-off, which needs `verified`.
+    verified_modes: frozenset = frozenset()
 
     def __init__(self, options: dict | None = None):
         self.options = options or {}

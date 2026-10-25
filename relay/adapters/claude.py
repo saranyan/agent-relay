@@ -5,9 +5,9 @@
   running interactive or background session, so live attach is unsupported.
   The relay does not substitute `--resume` (it starts a second writer on the
   same transcript) or fork.
-* `claude-stream` (UNVERIFIED): launches `claude -p` with stream-json input and
-  output and owns that process. Not yet run live; requires explicit authorization
-  and AGENT_RELAY_ALLOW_UNVERIFIED=1.
+* `claude-stream`: launches `claude -p` with stream-json input and output and owns
+  that process. Launch is verified live (Claude Code 2.1.310, 2026-10-25). Resume for
+  hand-off stays opt-in per folder (AGENT_RELAY_LIVE_HANDOFF_SCOPE).
 """
 
 from __future__ import annotations
@@ -411,6 +411,8 @@ def resume_argv(claude: str, conversation: str, *, no_tools: bool = True) -> lis
 class ClaudeStreamAdapter(Adapter):
     name = "claude-stream"
     verified = False
+    # Live run 2026-10-25: Claude Code 2.1.310 followed Codex 0.163.0 for 2 turns (launch only).
+    verified_modes = frozenset({"launch"})
     supports_writer_policy = True  # coding route (toolpolicy)
 
     def resume(self, cwd: str, conversation: str, options: dict | None = None, *,

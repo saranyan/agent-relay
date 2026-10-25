@@ -1,8 +1,9 @@
-"""Codex app-server adapter (UNVERIFIED — see docs/INTEGRATION-FEASIBILITY.md).
+"""Codex app-server adapter (see docs/INTEGRATION-FEASIBILITY.md).
 
 Written against the JSON Schema that `codex app-server generate-json-schema`
-emits for codex-cli 0.156.1. It has not been run against a live Codex session;
-live use requires explicit authorization and AGENT_RELAY_ALLOW_UNVERIFIED=1.
+emits. Launch is verified live (codex-cli 0.163.0 leading Claude Code, 2026-10-25).
+Attach still needs AGENT_RELAY_ALLOW_UNVERIFIED=1; resume for hand-off stays opt-in
+per folder and is blocked on 0.162+ permission provenance.
 
 * launch: child `codex app-server` over stdio, `thread/start`, `turn/start`.
 * attach: `codex app-server proxy` to the running shared daemon, then
@@ -498,6 +499,8 @@ class CodexConnection(Connection):
 class CodexAppServerAdapter(Adapter):
     name = "codex-app-server"
     verified = False
+    # Live run 2026-10-25: Codex 0.163.0 led Claude Code 2.1.310 for 2 turns (launch only).
+    verified_modes = frozenset({"launch"})
 
     def capabilities(self) -> dict[str, bool]:
         caps = {c: False for c in CAPABILITIES}
