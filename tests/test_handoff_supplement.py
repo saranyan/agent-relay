@@ -32,6 +32,7 @@ from unittest import mock
 from util import RelayTest, relay
 
 from relay.bus import Bus
+from relay.context import process_exited, process_start_ms
 from relay.controller import abandon_unknown, reconcile
 from relay.handoff import CLAIMS_LOCK, Handoffs, same_process
 from relay.host import Host
@@ -239,7 +240,7 @@ class ConsoleCrashDuringReturn(Base):
                               "--port", "0"], env=env, stdout=log, stderr=subprocess.STDOUT)
         self.procs.append(p)
         log.close()
-        for _ in range(150):
+        for _ in range(600):  # a cold start on a slow CI runner can take well over 15 s
             with open(log.name) as f:
                 text = f.read()
             if "http://127.0.0.1:" in text:
@@ -431,6 +432,19 @@ class StrictProbeIdentity(HostBase):
         finally:
             alive.kill()
             alive.wait()
+
+    def test_an_exited_unreaped_writer_is_not_running(self):
+        # A killed child stays a zombie until its parent reaps it; it still answers kill(pid, 0),
+        # and on some macOS versions ps reports no start time for it. It can't write: gone.
+        child = subprocess.Popen(["sleep", "30"])
+        try:
+            rec = {"pid": child.pid, "started_ms": process_start_ms(child.pid)}
+            os.kill(child.pid, signal.SIGKILL)
+            self.wait_until(lambda: process_exited(child.pid))
+            self.assertFalse(same_process(rec))
+            self.assertFalse(same_process(dict(rec, started_ms=None)))
+        finally:
+            child.wait()
 
     def test_midturn_refuses_without_a_verifiable_writer(self):
         # Codex's reproduction: writer started_ms None and the observed start time None.

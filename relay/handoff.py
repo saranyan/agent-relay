@@ -36,7 +36,7 @@ from .adapters import get_adapter
 from .adapters.base import Adapter, WriterBusy
 from .bus import Bus
 from .protocol import ABANDON_STATEMENT, unknown_turns
-from .context import process_start_ms, valid_start
+from .context import process_exited, process_start_ms, valid_start
 from .storage import Conflict, InvalidInput, NotFound, RelayError, Unsupported, actor, pid_alive
 
 WHO = actor("relay", "handoff")
@@ -53,7 +53,7 @@ BUSY_RETRY_S = 15
 
 def same_process(rec: dict | None) -> bool:
     """Is the process this record describes still running (same pid AND start time)?"""
-    if not rec or not rec.get("pid") or not pid_alive(rec["pid"]):
+    if not rec or not rec.get("pid") or not pid_alive(rec["pid"]) or process_exited(rec["pid"]):
         return False
     now = process_start_ms(rec["pid"])
     if not (valid_start(now) and valid_start(rec.get("started_ms"))):

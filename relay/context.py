@@ -131,6 +131,17 @@ def process_start_ms(pid: int) -> float | None:
         return None
 
 
+def process_exited(pid: int) -> bool:
+    """True if the process has exited but not been reaped (a zombie): it can't write anything."""
+    import subprocess
+    try:
+        out = subprocess.run(["ps", "-o", "stat=", "-p", str(pid)], capture_output=True,
+                             text=True, timeout=5).stdout.strip()
+    except (OSError, subprocess.TimeoutExpired):
+        return False
+    return out.startswith("Z")
+
+
 def process_ancestry(limit: int = 40) -> list[dict]:
     """This process and its ancestors: pid and start time (to guard against pid reuse)."""
     import subprocess

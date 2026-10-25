@@ -43,6 +43,13 @@ class Base(RelayTest):
         super().tearDown()
 
     # ------------------------------------------------------------ helpers
+    def stop_ticker(self):
+        """For tests that drive every tick themselves: otherwise the console's background
+        ticker runs hand-offs concurrently, and on a slow machine it gets there first."""
+        self.host._ticker_stop.set()
+        if self.host._ticker:
+            self.host._ticker.join(5)
+
     def terminal(self, sid, client, **default):
         """An open interactive terminal (no live attach) with two earlier turns."""
         default.setdefault("natural", True)
@@ -545,8 +552,9 @@ class SpawnCrashTests(Base):
         def fault(p):
             if p == point:
                 raise Crash(point)
+        self.stop_ticker()
         self.host.handoffs._fault = fault
-        with self.assertRaises(Crash):
+        with mock.patch.object(self.host, "_kick", lambda: None), self.assertRaises(Crash):
             self.host.handoff_tick()
         # The console dies here. Its writer process may already exist.
         self.host.handoffs.writers.clear()
@@ -604,7 +612,9 @@ class SpawnCrashTests(Base):
                 own.bus.fence(key, expect_gen=expect_gen, state=state, token=token, who=actor("test"))
                 raise RuntimeError("crash after the fence, before its evidence")
             return real_move(own, key, expect_gen=expect_gen, state=state, token=token, **detail)
-        with mock.patch.object(Ownership, "move", fence_only), self.assertRaises(RuntimeError):
+        self.stop_ticker()
+        with mock.patch.object(Ownership, "move", fence_only), \
+                mock.patch.object(self.host, "_kick", lambda: None), self.assertRaises(RuntimeError):
             self.host.handoff_tick()
         self.host.handoffs.writers.clear()
         again = self.new_host()
@@ -764,9 +774,7 @@ class RepeatedLaunchTests(Base):
         # This test drives every tick itself: stop the console's background ticker first, or it
         # can run the whole second launch before the fault is installed (seen: relay_owned at
         # gen 8 with no crash, about 1 run in 25).
-        self.host._ticker_stop.set()
-        if self.host._ticker:
-            self.host._ticker.join(5)
+        self.stop_ticker()
         self.host.handoffs._fault = fault
         with mock.patch.object(self.host, "_kick", lambda: None):
             self.host.hand_over_again(pid)
