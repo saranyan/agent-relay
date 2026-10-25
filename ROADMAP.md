@@ -14,11 +14,11 @@ Items aren't promises or dates. If you want to work on one, open an issue first.
 
 ### Make real sessions work (blocks 0.2)
 
-- [ ] **Accept the launch adapters with bounded live runs.** Run `claude-stream`
-  and `codex-app-server` through scripted, bounded acceptance runs in scratch
-  workspaces. Start with a no-tools exchange, then a small file task. Record
-  versions, receipts, completion events and cleanup. Then lift the
-  `AGENT_RELAY_ALLOW_UNVERIFIED` gate for each adapter that passes.
+- [x] **Accept the launch adapters with a bounded live run.** Done 2026-10-25: Codex
+  0.163.0 led Claude Code 2.1.310 for 2 turns in a scratch folder, with clean
+  cleanup. Launch no longer needs `AGENT_RELAY_ALLOW_UNVERIFIED`.
+- [ ] **Run a small file task live.** The acceptance run was reply-only. Repeat it
+  with a bounded file change, and with pause while a turn is in flight.
 - [ ] **Validate Codex attach.** Attach to a Codex session on the shared
   app-server and check four things: the original context is preserved, external
   terminal turns show as busy, the idle-check/send race is handled, and approval

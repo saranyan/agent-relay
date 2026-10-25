@@ -128,7 +128,7 @@ relay.
 | Variable | Purpose |
 |---|---|
 | `AGENT_RELAY_ROOT` | Relay root directory (or pass `--root`). Nothing is created implicitly. |
-| `AGENT_RELAY_ALLOW_UNVERIFIED=1` | Allow the unverified real-client adapters. |
+| `AGENT_RELAY_ALLOW_UNVERIFIED=1` | Allow modes not yet verified live, such as attaching to an open Codex session. Launch doesn't need it. |
 | `AGENT_RELAY_FAKE_HOME` | State directory for the fake clients used in demos and tests. |
 | `AGENT_RELAY_NOTIFY_CONFIG` | Optional decision-notification settings (webhook or SMS). These are off until configured and verified. |
 

@@ -1,41 +1,23 @@
 # agent-relay
 
-**Let one AI coding session manage another, while you stay in charge.**
+**Let AI coding sessions from different vendors work together, while you stay in charge.**
 
 <picture>
   <source media="(prefers-color-scheme: light)" srcset="docs/images/home-light.png">
   <img alt="The agent-relay web console listing Claude and Codex sessions, one needing a decision and two managed by AI" src="docs/images/home-dark.png">
 </picture>
 
-> **This is a prototype.** It works end to end with the bundled pretend clients, and
-> it's built to be careful with real ones. The real Claude Code and Codex adapters
-> haven't passed a recorded live run yet, so they stay switched off unless you opt
-> in. Treat it as a working sketch of an idea to try, fork and extend.
+## Why
 
-## The story
+Claude can hand work to Claude on its own. But when you work with sessions from
+**different vendors**, such as Codex for planning and review and Claude Code for
+the code, they can't talk to each other. Without a relay, **you're the one
+transferring context**: copying plans, results and reviews between terminals.
 
-You have two terminals open. In one, Codex is good at planning and reviewing. In
-the other, Claude Code is good at writing the code. You've become the courier
-between them. You copy the plan from one, paste it into the other, wait, copy the
-result back, ask for a review, and paste the fixes over again. It works, but you're
-the slowest part of the loop, and you can't step away from your desk.
-
-**agent-relay does the carrying.** You pick one session as the **leader**, the one
-that plans and reviews. You pick another as the **follower**, the one that does the
-work. Then you give them a goal, a turn budget and a time limit. The relay passes
-each turn across, writes every message to disk, and keeps going until the work is
-done or something needs you.
-
-**It stops for you.** A session asks a question, a client shows an approval prompt,
-a reply looks like it contains a secret, a turn times out, or delivery becomes
-uncertain. Any of these pauses the loop, and it doesn't continue until you decide.
-Messages that *claim* approval grant nothing. Only you can approve.
-
-**You can watch from anywhere on your machine.** `relay serve` opens a local web
-page. It shows every Claude and Codex session the relay can see, what each is
-doing in plain language, and which ones are waiting for you. You can hand a session
-to an AI manager with a style (Reviewer, Planner or Pair programmer), watch the
-conversation, and press **Intervene** to take back control at any moment.
+agent-relay carries the turns for you. One session leads, the other follows, and
+the relay passes each turn across, records it on your disk, and stops whenever
+something needs your decision. It's tested with Claude Code and Codex, and you can
+extend it to whatever agents you work with by writing an adapter.
 
 <table>
   <tr>
@@ -43,14 +25,6 @@ conversation, and press **Intervene** to take back control at any moment.
     <td width="50%"><img alt="A session stopped to ask the user a question, with an answer box" src="docs/images/decision.png"><br><sub><b>Decide:</b> questions stop the loop until you answer.</sub></td>
   </tr>
 </table>
-
-**Nothing gets lost.** Every message is immutable, and every state change is an
-append-only, hash-chained event on your own disk. If the relay crashes, it never
-quietly resends a turn that might already have been delivered. It asks you instead.
-
-**It's small on purpose.** It uses only the Python standard library. There's no
-daemon, database, API key or hosted account. The only network listener is the
-optional web console, which binds to loopback.
 
 ## Try it in two minutes
 
@@ -62,6 +36,14 @@ git clone https://github.com/saranyan/agent-relay.git && cd agent-relay
 
 scripts/console-demo.sh      # the web console, with a few pretend sessions
 scripts/walkthrough.sh       # the full two-terminal flow in a temporary folder
+```
+
+With the Claude Code and Codex CLIs installed, run it on real sessions:
+
+```sh
+export AGENT_RELAY_ROOT=~/relay-root
+bin/relay init --participants codex claude
+bin/relay console      # [n] launch Codex and Claude Code, [p] pair them, [s] start
 ```
 
 The [web console tour](docs/web-console.md) walks through every screen. The
@@ -153,7 +135,8 @@ The specification is in [docs/PROTOCOL.md](docs/PROTOCOL.md).
 |---|---|
 | Bus, controller, terminal console, web console | Working, covered by the test suite with pretend clients |
 | Discovery of running Claude Code and Codex sessions | Working, read-only, on macOS |
-| Driving real Claude Code and Codex sessions | Built, **unverified**, off unless `AGENT_RELAY_ALLOW_UNVERIFIED=1` |
+| Codex and Claude Code driving each other (sessions the relay starts) | **Verified live**: Codex 0.163.0 led Claude Code 2.1.310, 2026-10-25 |
+| Attaching to an open Codex session, handing an existing session over | Built, not yet verified live. Off unless you opt in. |
 | Driving a Claude Code session while it's open in a terminal | Not possible. Open sessions are handed over (closed and resumed) instead. |
 
 What's needed to get from prototype to dependable is in the [roadmap](ROADMAP.md).

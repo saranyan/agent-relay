@@ -17,8 +17,9 @@ started, and no credential or transcript was read.
 >   only `ai-title` records. Message content is never stored or shown.
 > - **Verification levels differ.** The Python test suite is run independently.
 >   Browser checks of the web console were run and reported by an agent. The demos
->   use simulated sessions. The real launch and attach adapters are still
->   **unverified** by any authorized live run.
+>   use simulated sessions. **Launch is verified live:** on 2026-10-25, Codex
+>   0.163.0 led Claude Code 2.1.310 through a bounded 2-turn run. Attach and
+>   hand-off are still unverified.
 
 ## Versions and method
 
@@ -75,11 +76,11 @@ Columns:
 | `fake` | verified (repository contract) | attach, launch | Fake terminal clients used by tests and the walkthrough. Proves the relay logic only, not real-client behaviour. |
 | `claude-agents` | verified, locally, for discovery only | discover | Lists running Claude sessions with their limits. Titles are parsed from the transcript tail (only `ai-title` records are extracted). `sessions attach` refuses with exit code 9 and never substitutes resume, fork or launch. |
 | `codex-local` | verified, locally, for discovery only | discover | Read-only listing of running standalone Codex terminals. A plain `codex resume` process is matched by inference and shown as uncertain. Archived threads are excluded. On an unrecognized layout it reports an error and lists nothing. |
-| `claude-stream` | **unverified** | launch | `claude -p` stream-json child with `--replay-user-messages` for acceptance, `result` for completion and `--permission-prompts none` (the relay never answers a prompt). |
-| `codex-app-server` | **unverified** | launch (stdio), attach (daemon via `codex app-server proxy`) | `turn/start` plus `turn/completed`. Activity comes only from server status (initial thread status, `thread/status/changed`, external `turn/started`/`turn/completed`); unknown means no dispatch. Attach first checks `thread/loaded/list` and refuses a thread that isn't live, rather than reopening stored history. Approvals are tracked by JSON-RPC request ID and never answered. Launch defaults to `approvalPolicy: never` and `sandbox: workspace-write`, because a headless child has no native approval UI. Wire-level contract tests use recorded notification shapes; there is still no live run. |
+| `claude-stream` | launch **verified** (2.1.310) | launch | `claude -p` stream-json child with `--replay-user-messages` for acceptance, `result` for completion and `--permission-prompts none` (the relay never answers a prompt). |
+| `codex-app-server` | launch **verified** (0.163.0); attach unverified | launch (stdio), attach (daemon via `codex app-server proxy`) | `turn/start` plus `turn/completed`. Activity comes only from server status (initial thread status, `thread/status/changed`, external `turn/started`/`turn/completed`); unknown means no dispatch. Attach first checks `thread/loaded/list` and refuses a thread that isn't live, rather than reopening stored history. Approvals are tracked by JSON-RPC request ID and never answered. Launch defaults to `approvalPolicy: never` and `sandbox: workspace-write`, because a headless child has no native approval UI. Wire-level contract tests use recorded notification shapes; launch passed a live run on 2026-10-25. |
 
-The controller refuses unverified adapters unless `AGENT_RELAY_ALLOW_UNVERIFIED=1`
-is set. That should happen only after you pick the sessions and authorize a live test.
+The controller refuses modes that haven't been verified live (today: attach) unless
+`AGENT_RELAY_ALLOW_UNVERIFIED=1` is set. That should happen only after you pick the sessions and authorize a live test.
 
 ## Surface by surface
 
@@ -129,4 +130,4 @@ In an isolated scratch workspace, with a harmless bounded task (for example, "cr
 2. **Launch.** Pair two launched sessions and check targeted delivery, completion, pause with a turn in flight, and child cleanup.
 3. Record client versions and observed limits in this file. Copy no transcripts or credentials.
 
-Until then, live integration is **unverified**, not accepted.
+Step 2 passed reply-only on 2026-10-25 (Codex 0.163.0, Claude Code 2.1.310): both sessions confirmed, 2 turns delivered and completed, the leader finished, both children exited, the folder stayed empty. Pause with a turn in flight and a file task are still to do. Step 1 (attach) is still **unverified**.

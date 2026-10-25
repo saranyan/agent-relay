@@ -6,6 +6,18 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- **Launch is verified live.** Codex 0.163.0 (`codex-app-server`) led Claude Code
+  2.1.310 (`claude-stream`) through a bounded 2-turn run. Sessions the relay starts
+  no longer need `AGENT_RELAY_ALLOW_UNVERIFIED=1`. Attach and hand-off are still
+  gated. Adapters now declare `verified_modes`.
+
+### Fixed
+
+- **A killed, unreaped writer counted as running.** It now counts as gone.
+- **Flaky tests on GitHub's macOS runners.**
+
 ## [0.1.0] - 2026-10-24
 
 The first public release: an experimental developer preview.
