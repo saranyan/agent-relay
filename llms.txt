@@ -1,0 +1,30 @@
+# agent-relay
+
+> agent-relay lets AI coding sessions from different vendors work together while you stay in charge. One session, such as Codex, leads and another, such as Claude Code, follows: the relay passes each turn between them, records every message on disk, and stops whenever something needs your decision. It runs locally, with a terminal console, a loopback-only web console and a scriptable CLI.
+
+A local Python tool (`relay`, or `bin/relay` from a checkout) with a durable hash-chained message bus, a foreground pair controller and adapters for Claude Code and Codex. The relay launching Codex and Claude Code and having them drive each other is verified live; attaching to sessions already open in a terminal, and handing them over, aren't verified yet and stay off unless you opt in. Python 3.11+, macOS, no dependencies, MIT license. Full documentation in one file: [llms-full.txt](https://raw.githubusercontent.com/saranyan/agent-relay/main/llms-full.txt).
+
+## Docs
+
+- [README](https://raw.githubusercontent.com/saranyan/agent-relay/main/README.md): Why the relay exists, how to try it with pretend sessions, what it can and can't see, and current status.
+- [Web console tour](https://raw.githubusercontent.com/saranyan/agent-relay/main/docs/web-console.md): Every screen of `relay serve`: sessions, managing a session with an AI, watching, answering decisions, the event log, phone layout and notifications.
+- [Walkthrough](https://raw.githubusercontent.com/saranyan/agent-relay/main/docs/WALKTHROUGH.md): A recorded two-terminal run with fake clients, showing real message and turn IDs.
+
+## Examples
+
+- [walkthrough.sh](https://raw.githubusercontent.com/saranyan/agent-relay/main/scripts/walkthrough.sh): Reproduces the full two-terminal flow with fake clients in a temporary folder. No real session or model is used.
+- [console-demo.sh](https://raw.githubusercontent.com/saranyan/agent-relay/main/scripts/console-demo.sh): Opens the web console with a few pretend sessions. Notifications go to a local file, never sent.
+
+## API
+
+- [Reference](https://raw.githubusercontent.com/saranyan/agent-relay/main/docs/REFERENCE.md): Install, the terminal and web consoles, every CLI command and exit code, configuration variables, and guarantees and limits.
+- [Protocol](https://raw.githubusercontent.com/saranyan/agent-relay/main/docs/PROTOCOL.md): The normative specification: relay root layout, message envelopes, event streams, state machines and the adapter contract.
+- [Claude participant instructions](https://raw.githubusercontent.com/saranyan/agent-relay/main/prompts/claude.md): Standalone instructions for a Claude Code session taking part as the follower.
+- [Codex participant instructions](https://raw.githubusercontent.com/saranyan/agent-relay/main/prompts/codex.md): Standalone instructions for a Codex session taking part as the leader.
+
+## Optional
+
+- [Roadmap](https://raw.githubusercontent.com/saranyan/agent-relay/main/ROADMAP.md): What's left before real sessions are dependable, and ideas after that.
+- [Integration feasibility](https://raw.githubusercontent.com/saranyan/agent-relay/main/docs/INTEGRATION-FEASIBILITY.md): What real Claude Code and Codex interfaces can and can't do, as observed in a dated snapshot.
+- [Context reporting](https://raw.githubusercontent.com/saranyan/agent-relay/main/docs/CONTEXT-REPORTING.md): How session titles and summaries are discovered and reported, descriptive only.
+- [Changelog](https://raw.githubusercontent.com/saranyan/agent-relay/main/CHANGELOG.md): Changes by release.

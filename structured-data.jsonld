@@ -1,0 +1,20 @@
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "agent-relay",
+  "description": "Let AI coding sessions from different vendors work together while you stay in charge. One session, such as Codex, leads and another, such as Claude Code, follows: the relay passes each turn between them, records every message on disk, and stops whenever something needs your decision.",
+  "codeRepository": "https://github.com/saranyan/agent-relay",
+  "programmingLanguage": {
+    "@type": "ComputerLanguage",
+    "name": "Python",
+    "url": "https://www.python.org"
+  },
+  "runtimePlatform": "Python 3.11+ on macOS",
+  "version": "0.1.0",
+  "license": "https://opensource.org/licenses/MIT",
+  "author": {
+    "@type": "Person",
+    "name": "Saranyan Vigraham",
+    "url": "https://github.com/saranyan"
+  }
+}

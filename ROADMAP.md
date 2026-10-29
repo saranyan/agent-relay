@@ -1,8 +1,9 @@
 # Roadmap
 
 agent-relay is at **0.1.0, an experimental developer preview**. The core works
-end to end with fake clients. The main gap is that no real Claude Code or Codex
-adapter has passed a recorded live acceptance run yet.
+end to end, and the relay launching real Codex and Claude Code sessions and
+having them drive each other is verified live. Attaching to sessions you already
+have open, and handing them over, aren't verified yet.
 
 This page has two parts:
 - **To do:** what's needed to reach a release people can use with real sessions.
